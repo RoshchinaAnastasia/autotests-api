@@ -20,8 +20,10 @@ login_payload = {
     "password": create_user_payload["password"],
 }
 
-login_response = httpx.post("http://127.0.0.1:8000/api/v1/authentication/login",
-                            json=login_payload)
+login_response = httpx.post(
+    "http://127.0.0.1:8000/api/v1/authentication/login",
+    json=login_payload
+)
 login_response_data = login_response.json()
 print('Login data:', login_response_data)
 

@@ -31,7 +31,7 @@ user_login_response = httpx.post(
 )
 
 print ('User logged in, status code:', user_login_response.status_code)
-print(user_login_response.json())
+print (user_login_response.json())
 
 user_update_payload = {
   "email": get_random_email(),
