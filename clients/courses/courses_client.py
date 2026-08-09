@@ -1,8 +1,22 @@
-from idlelib import query
-
 from clients.api_client import APIClient
 from httpx import Response
 from typing import TypedDict
+from clients.files.files_client import File
+from clients.users.private_users_client import User
+from clients.private_http_builder import get_private_http_client, AuthenticationUserDict
+
+class Course(TypedDict):
+    """
+    Описание структуры курса.
+    """
+    id: str
+    title: str
+    maxScore: int
+    minScore: int
+    description: str
+    previewFile: File
+    estimatedTime: str
+    createdByUser: User
 
 class GetCoursesQueryDict(TypedDict):
     """
@@ -21,6 +35,12 @@ class CreateCourseRequestDict(TypedDict):
     estimatedTime: str
     previewFileId: str
     createdByUserId: str
+
+class CreateCourseResponseDict(TypedDict):
+    """
+    Описание структуры ответа создания курса.
+    """
+    course: Course
 
 class UpdateCourseRequestDict(TypedDict):
     """
@@ -44,7 +64,7 @@ class CoursesClient(APIClient):
         :param query: Словарь с userId.
         :return: Ответ от сервера в виде объекта httpx.Response
         """
-        return self.get(f"/api/v1/courses/", params=query)
+        return self.get(f"/api/v1/courses", params=query)
 
     def get_course_api(self, course_id: str)-> Response:
         """
@@ -63,7 +83,7 @@ class CoursesClient(APIClient):
         previewFileId, createdByUserId.
         :return: Ответ от сервера в виде объекта httpx.Response
         """
-        return self.post(f"/api/v1/courses/", json=request)
+        return self.post(f"/api/v1/courses", json=request)
 
     def update_course_api(self, course_id:str, request:UpdateCourseRequestDict)-> Response:
         """
@@ -84,3 +104,14 @@ class CoursesClient(APIClient):
         """
         return self.delete(f"/api/v1/courses/{course_id}")
 
+    def create_course(self, request:CreateCourseRequestDict)-> CreateCourseResponseDict:
+        response = self.create_course_api(request)
+        return response.json()
+
+def get_courses_client(user: AuthenticationUserDict) -> CoursesClient:
+    """
+    Функция создаёт экземпляр CoursesClient с уже настроенным HTTP-клиентом.
+
+    :return: Готовый к использованию CoursesClient.
+    """
+    return CoursesClient(client=get_private_http_client(user))
