@@ -25,11 +25,14 @@ class FilesClient(APIClient):
         :param request: Словарь с filename, directory, upload_file.
         :return: Ответ от сервера в виде объекта httpx.Response
         """
+        data = request.model_dump(by_alias=True, exclude={"upload_file"})
+        print("DATA:", data)
         return self.post(
             f"/api/v1/files",
             data = request.model_dump(by_alias=True, exclude={"upload_file"}),
             files={"upload_file": open(request.upload_file, "rb")}
         )
+
 
     def delete_file_api(self, file_id:str)-> Response:
         """
